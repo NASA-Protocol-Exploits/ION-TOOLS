@@ -1,13 +1,9 @@
 #import libraies
-from re import L
-from tkinter import ttk
 import tkinter as tk
-from xml.dom.minicompat import NodeList
-import igraph as ig
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import NT_User_Interface.NT_UI_Main
 from NT_User_Interface.NT_UI_Error import ErrorGUI
 
+#define node class used by the application, essentially just a linked list
 class node():
     def __init__(self):
         self.name = ""
@@ -20,12 +16,13 @@ def AddNode(nodes,node):
 def NodeConstructor():
     return node()
 
+#function to prevent the window from moving on refresh
 def UpdateWindowLocation(UI,windowLocation):
     windowLocation[0],windowLocation[1]=UI.winfo_x(),UI.winfo_y()
     return windowLocation
 
 #User interface for creating new nodes
-def AddNodeGui(windowLocation,networkMap,nodes):
+def AddNodeGui(windowLocation,nodes):
 
     UI = tk.Toplevel()
     windowX = str(windowLocation[0])
@@ -124,12 +121,12 @@ def AddNodeGui(windowLocation,networkMap,nodes):
             AddNode(nodes,node)
             UpdateWindowLocation(UI,windowLocation)
             UI.destroy()
-            NT_User_Interface.NT_UI_Main.MainGUI(windowLocation,networkMap,nodes)
+            NT_User_Interface.NT_UI_Main.MainGUI(windowLocation,nodes)
 
     UI.confirmbutton = tk.Button(UI, width=16, text="Create Node", command=lambda:CreateNode(UI,nodes))
     UI.confirmbutton.grid(row = 6, column = 0, columnspan = 3, pady = 2)
     UI.cancelButton = tk.Button(UI, width=16 ,text="Cancel", command=lambda:(UpdateWindowLocation(UI,windowLocation),
                                                                              UI.destroy(),
-                                                                             NT_User_Interface.NT_UI_Main.MainGUI(windowLocation,networkMap,nodes)))
+                                                                             NT_User_Interface.NT_UI_Main.MainGUI(windowLocation,nodes)))
     UI.cancelButton.grid(row = 6, column = 4, columnspan = 3, pady = 2)
  

@@ -1,19 +1,16 @@
 #import libraies
-from re import L
 from tkinter import ttk
 import tkinter as tk
-from xml.dom.minicompat import NodeList
-import igraph as ig
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import NT_User_Interface.NT_UI_Main
-
 from NT_User_Interface.NT_UI_Error import ErrorGUI
 
-
+#function to prevent the window from moving on refresh
 def UpdateWindowLocation(UI,windowLocation):
     windowLocation[0],windowLocation[1]=UI.winfo_x(),UI.winfo_y()
     return windowLocation
 
+#This tool essentally creates a copy of the node, fills the ui with the information,
+#then deletes the old node creating a new one in its place
 class node():
     def __init__(self):
         self.name = ""
@@ -27,7 +24,7 @@ def NodeConstructor():
         return node()
 
 #Define a function to close the window with confirmation window
-def ModifyNodeGui(windowLocation,networkMap,nodes,nodeName):
+def EditNodeGui(windowLocation,nodes,nodeName):
     for node in nodes:
         if( node.name == nodeName):
             targetNode = node
@@ -37,7 +34,7 @@ def ModifyNodeGui(windowLocation,networkMap,nodes,nodeName):
     windowX = str(windowLocation[0])
     windowY = str(windowLocation[1])
     UI.geometry("+"+windowX+"+"+windowY)
-    UI.title('Update Node')
+    UI.title('Modify Existing Node')
 
     #Node Name Input Section
     totalColums = 7
@@ -144,36 +141,36 @@ def ModifyNodeGui(windowLocation,networkMap,nodes,nodeName):
             AddNode(nodes,node)
             UpdateWindowLocation(UI,windowLocation)
             UI.destroy()
-            NT_User_Interface.NT_UI_Main.MainGUI(windowLocation,networkMap,nodes)
+            NT_User_Interface.NT_UI_Main.MainGUI(windowLocation,nodes)
 
-    UI.confirmbutton = tk.Button(UI, width=16, text="Update node", command=lambda:CreateNode(UI,nodes))
+    UI.confirmbutton = tk.Button(UI, width=16, text="Apply", command=lambda:CreateNode(UI,nodes))
     UI.confirmbutton.grid(row = 6, column = 0, columnspan = 3, pady = 2)
     UI.cancelButton = tk.Button(UI, width=16 ,text="Cancel", command=lambda:(UpdateWindowLocation(UI,windowLocation),
                                                                              UI.destroy(),
-                                                                             NT_User_Interface.NT_UI_Main.MainGUI(windowLocation,networkMap,nodes)))
+                                                                             NT_User_Interface.NT_UI_Main.MainGUI(windowLocation,nodes)))
     UI.cancelButton.grid(row = 6, column = 4, columnspan = 3, pady = 2)
 
-def CheckIfNullEntry(UI,windowLocation,networkMap,nodes):
+def CheckIfNullEntry(UI,windowLocation,nodes):
     selectedNode = UI.combo.get()
     found = False
     for node in nodes:
         if(node.name == selectedNode):
             found = True
-            ModifyNodeGui(UpdateWindowLocation(UI,windowLocation),networkMap,nodes,selectedNode)
+            EditNodeGui(UpdateWindowLocation(UI,windowLocation),nodes,selectedNode)
             UI.destroy()
             break
     if(not found):
         ErrorGUI(UpdateWindowLocation(UI,windowLocation),"No Node Selected")
 
 #Define a function to close the window with confirmation window
-def UpdateNodeGui(windowLocation,networkMap,nodes):
+def ModifyNodeGui(windowLocation,nodes):
     #Create Higher level Window
     UI = tk.Toplevel()
     windowX = str(windowLocation[0])
     windowY = str(windowLocation[1])
     UI.geometry("300x80"+"+"+windowX+"+"+windowY)
-    UI.title('Update Node')
-    UI.windowMessage = tk.Label(UI,text = "Choose Node to Update")
+    UI.title('Modify Node')
+    UI.windowMessage = tk.Label(UI,text = "Choose Node to Modify")
     UI.windowMessage.pack()
 
     nodeList = []
@@ -183,10 +180,10 @@ def UpdateNodeGui(windowLocation,networkMap,nodes):
     UI.combo = ttk.Combobox(UI,state="readonly",values = nodeList)
     UI.combo.pack()
 
-    configureButton = tk.Button(UI, width=20 ,text="Update", command=lambda:CheckIfNullEntry(UI,windowLocation,networkMap,nodes))
+    configureButton = tk.Button(UI, width=20 ,text="Select", command=lambda:CheckIfNullEntry(UI,windowLocation,nodes))
     configureButton.pack(side=tk.LEFT)
 
     cancelButton = tk.Button(UI, width=20 ,text="Cancel", command=lambda:(UpdateWindowLocation(UI,windowLocation),
                                                                                         UI.destroy(),
-                                                                                        NT_User_Interface.NT_UI_Main.MainGUI(windowLocation,networkMap,nodes)))
+                                                                                        NT_User_Interface.NT_UI_Main.MainGUI(windowLocation,nodes)))
     cancelButton.pack(side=tk.LEFT)

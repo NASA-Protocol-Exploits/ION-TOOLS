@@ -1,14 +1,15 @@
 #import libraies
-from tkinter import ttk
 import tkinter as tk
 
+#Import all sub-UIs that can be called from the main window
 from NT_User_Interface.NT_UI_Node_Add import AddNodeGui
 from NT_User_Interface.NT_UI_Node_Remove import RemoveNodeGui
-from NT_User_Interface.NT_UI_Node_Update import UpdateNodeGui
+from NT_User_Interface.NT_UI_Node_Modify import ModifyNodeGui
 from NT_User_Interface.NT_UI_Graph import DrawGraph
 from NT_User_Interface.NT_UI_Error import ErrorGUI
 from NT_User_Interface.NT_UI_Node_Connections import NodeConnectionsGui
 
+#function to prevent the window from moving on refresh
 def UpdateWindowLocation(UI,windowLocation):
     windowLocation[0],windowLocation[1]=UI.winfo_x(),UI.winfo_y()
     return windowLocation
@@ -29,46 +30,51 @@ def ConfirmClose(windowLocation,UI):
     yesButton = tk.Button(closeWindow, width=20 ,text="Yes", command=lambda:(closeWindow.destroy(),UI.quit()))
     yesButton.pack(side=tk.LEFT)
 
-
-def RemoveNode(UI,windowLocation,networkMap,nodes):
+#Node modifying functions should not be usable untill at least one node is present
+def RemoveNode(UI,windowLocation,nodes):
     if (len(nodes)<1):
         ErrorGUI(UpdateWindowLocation(UI,windowLocation),"No nodes to remove")
     else:
         UpdateWindowLocation(UI,windowLocation)
         UI.destroy(),
-        RemoveNodeGui(windowLocation,networkMap,nodes)
+        RemoveNodeGui(windowLocation,nodes)
 
-def UpdateNode(UI,windowLocation,networkMap,nodes):
-    if (len(nodes)<1):
-        ErrorGUI(UpdateWindowLocation(UI,windowLocation),"No nodes to update")
-    else:
-        UpdateWindowLocation(UI,windowLocation)
-        UI.destroy(),
-        UpdateNodeGui(windowLocation,networkMap,nodes)
-
-def ModifyNodeConnections(UI,windowLocation,networkMap,nodes):
+def ModifyNode(UI,windowLocation,nodes):
     if (len(nodes)<1):
         ErrorGUI(UpdateWindowLocation(UI,windowLocation),"No nodes to modify")
     else:
         UpdateWindowLocation(UI,windowLocation)
         UI.destroy(),
-        NodeConnectionsGui(windowLocation,networkMap,nodes)
+        ModifyNodeGui(windowLocation,nodes)
+
+def ModifyNodeConnections(UI,windowLocation,nodes):
+    if (len(nodes)<1):
+        ErrorGUI(UpdateWindowLocation(UI,windowLocation),"No nodes to modify")
+    else:
+        UpdateWindowLocation(UI,windowLocation)
+        UI.destroy(),
+        NodeConnectionsGui(windowLocation,nodes)
+
+
+
 #Main user interface for program
-def MainGUI(windowLocation,networkMap,nodes):    #Tkinter GUI
+def MainGUI(windowLocation,nodes):    #Tkinter GUI
 
     #Create instance of GUI class
     UI = tk.Tk()
-
-    windowX = str(windowLocation[0])
-    windowY = str(windowLocation[1])
-    UI.geometry("+"+windowX+"+"+windowY)
+    #Set window location based on starting/updated position
+    UI.geometry("+"+str(windowLocation[0])+"+"+str(windowLocation[1]))
 
     #Configure Windows
     UI.title('Node-tool')
+
+    #List of the node names that exist in the list, used to display information to the user
     nodeList = []
     
+    #varible used to set the amount of columns used by the UI, used for formatting purposes
     totalColums = 6
 
+    #Information regarding network is displayed to the user in the primary UI
     UI.nodeListHeadder = tk.Label(UI, text="Current Nodes")
     UI.nodeListHeadder.grid(row = 0, column = 0, columnspan = totalColums, pady = 2)
 
@@ -82,21 +88,22 @@ def MainGUI(windowLocation,networkMap,nodes):    #Tkinter GUI
 
     buttonWidth = 20
 
+    #Buttons that trigger the various functions of the app
     UI.button = tk.Button(UI,width=buttonWidth , text="Add Node", command=lambda:(UpdateWindowLocation(UI,windowLocation),
                                                                UI.destroy(),
-                                                               AddNodeGui(windowLocation,networkMap,nodes)))
+                                                               AddNodeGui(windowLocation,nodes)))
     UI.button.grid(row = 3, column = 0,pady = 2)
 
-    UI.button = tk.Button(UI,width=buttonWidth , text="Remove Node", command=lambda:RemoveNode(UI,windowLocation,networkMap,nodes))
+    UI.button = tk.Button(UI,width=buttonWidth , text="Remove Node", command=lambda:RemoveNode(UI,UpdateWindowLocation(UI,windowLocation),nodes))
     UI.button.grid(row = 3, column = 1,pady = 2)
 
-    UI.button = tk.Button(UI,width=buttonWidth ,text="Update Node", command=lambda:UpdateNode(UI,windowLocation,networkMap,nodes))
+    UI.button = tk.Button(UI,width=buttonWidth ,text="Modify Node", command=lambda:ModifyNode(UI,UpdateWindowLocation(UI,windowLocation),nodes))
     UI.button.grid(row = 3, column = 2,pady = 2)
 
-    UI.button = tk.Button(UI, width=buttonWidth ,text="Modify Node Connections", command=lambda:ModifyNodeConnections(UI,windowLocation,networkMap,nodes))
+    UI.button = tk.Button(UI, width=buttonWidth ,text="Change Node Connections", command=lambda:ModifyNodeConnections(UI,UpdateWindowLocation(UI,windowLocation),nodes))
     UI.button.grid(row = 4, column = 0,pady = 2)
 
-    UI.button = tk.Button(UI,width=buttonWidth ,text="Draw Network Graph", command=lambda:DrawGraph(UI,networkMap))
+    UI.button = tk.Button(UI,width=buttonWidth ,text="Draw Network Graph", command=lambda:DrawGraph(UI,nodes))
     UI.button.grid(row = 4, column = 1,pady = 2)
 
     UI.button = tk.Button(UI,width=buttonWidth ,text="Close Program", command=lambda:(UpdateWindowLocation(UI,windowLocation),ConfirmClose(windowLocation,UI)))

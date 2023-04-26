@@ -1,15 +1,18 @@
 #import libraies
-from re import L
-from tkinter import ttk
 import tkinter as tk
-from xml.dom.minicompat import NodeList
 import igraph as ig
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from NT_Graph_Generation.NT_GraphGen import GenerateGraph
 
 
+
+networkMap = ig.Graph(directed=False)
+#Create Initial vertice - Minumum of 1 required
+networkMap.add_vertices(1)
+
+
 #Define a function to close the window with confirmation window
-def DrawGraph(UI,networkMap):
+def DrawGraph(UI,nodes):
     #Create Higher level Window
     graphWindow = tk.Toplevel()
     graphWindow.title('Confirm Exit')
