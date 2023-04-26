@@ -11,7 +11,7 @@ from NT_User_Interface.NT_UI_Error import ErrorGUI
 class node():
     def __init__(self):
         self.name = ""
-        self.IPAddress = ""
+        self.IPAddress = []
         self.connectedNodes = []
 
 def AddNode(nodes,node):
@@ -22,6 +22,7 @@ def NodeConstructor():
 
 def UpdateWindowLocation(UI,windowLocation):
     windowLocation[0],windowLocation[1]=UI.winfo_x(),UI.winfo_y()
+    return windowLocation
 
 #User interface for creating new nodes
 def AddNodeGui(windowLocation,networkMap,nodes):
@@ -81,32 +82,32 @@ def AddNodeGui(windowLocation,networkMap,nodes):
         nodeNameCharacterLimit = 16
         nameInput = UI.nodeNameEntry.get()
         if(len(nameInput)==0):
-                ErrorGUI(UI,"Node name not entered")
+                ErrorGUI(UpdateWindowLocation(UI,windowLocation),"Node name not entered")
                 return False
 
         for node in nodes:
             if(node.name==nameInput):
-                ErrorGUI(UI,"Node "+nameInput+" Allready Exists")
+                ErrorGUI(UpdateWindowLocation(UI,windowLocation),"Node "+nameInput+" Allready Exists")
                 return False
 
 
         if(len(nameInput)>nodeNameCharacterLimit):
-            ErrorGUI(UI,"Node Name Character limit Exceeded\n Character Limit : "+str(nodeNameCharacterLimit))
+            ErrorGUI(UpdateWindowLocation(UI,windowLocation),"Node Name Character limit Exceeded\n Character Limit : "+str(nodeNameCharacterLimit))
             return False
         
         octets = [UI.IPaddressBit1.get(),UI.IPaddressBit2.get(),UI.IPaddressBit3.get(),UI.IPaddressBit4.get()]
 
         for octet in octets:
             if(len(octet)==0):
-                ErrorGUI(UI,"IP address Not entered")
+                ErrorGUI(UpdateWindowLocation(UI,windowLocation),"IP address Not entered")
                 invalid = True
                 break
             elif(not octet.isnumeric()):
-                ErrorGUI(UI,"Ip address must only contain numbers")
+                ErrorGUI(UpdateWindowLocation(UI,windowLocation),"Ip address must only contain numbers")
                 invalid = True
                 break
             elif(int(octet)>255 or int(octet)<0):
-                ErrorGUI(UI,"One or more octets are out of range\n Range : 0-255")
+                ErrorGUI(UpdateWindowLocation(UI,windowLocation),"One or more octets are out of range\n Range : 0-255")
                 invalid = True
                 break
 
@@ -117,11 +118,9 @@ def AddNodeGui(windowLocation,networkMap,nodes):
 
     def CreateNode(UI,nodes):
         if (inputValdation(UI,nodes)):
-            octets = [UI.IPaddressBit1.get(),UI.IPaddressBit2.get(),UI.IPaddressBit3.get(),UI.IPaddressBit4.get()]
-            IPaddress = octets[0]+octets[1]+octets[2]+octets[3]
             node = NodeConstructor()
             node.name = UI.nodeNameEntry.get()
-            node.IPAddress = IPaddress
+            node.IPAddress = [UI.IPaddressBit1.get(),UI.IPaddressBit2.get(),UI.IPaddressBit3.get(),UI.IPaddressBit4.get()]
             AddNode(nodes,node)
             UpdateWindowLocation(UI,windowLocation)
             UI.destroy()
